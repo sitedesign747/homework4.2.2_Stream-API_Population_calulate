@@ -1,7 +1,6 @@
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Main {
 
@@ -10,10 +9,11 @@ public class Main {
         List<String> names = Arrays.asList("Jack", "Connor", "Harry", "George", "Samuel", "John");
         List<String> families = Arrays.asList("Evans", "Young", "Harris", "Wilson", "Davies", "Adamson", "Brown");
         Collection<Person> persons = new ArrayList<>();
-        long count1 = 0;
+        long count1;
         long count2 = 0;
         long countArmy = 0;
         long countWorkers = 0;
+        String falily2;
         for (int i = 0; i < 10_000_000; i++) {
             persons.add(new Person(
                     names.get(new Random().nextInt(names.size())),
@@ -22,51 +22,40 @@ public class Main {
                     Sex.values()[new Random().nextInt(Sex.values().length)],
                     Education.values()[new Random().nextInt(Education.values().length)])
             );
-             count1 = IntStream.of(Person.getAge())
+            count1 = IntStream.of(Person.getAge())
                     .filter(x -> x < 18)
                     .count();
             count2 = count2 + count1;
 
-        Stream<Integer> namesArmy = Stream.of(Person.getAge());
-        List<String> d =  namesArmy
-                .filter(x -> x >= 18 && x <= 27)
-                .map(y -> String.valueOf(Person.getSex()))
-                .filter(y -> y == "MAN")
-                .map(n ->  String.valueOf(Person.getFamily()))
-                .collect(Collectors.toList());
-        if (d.size()!=0) {System.out.println(d);}
-        if (d.size()!=0) { countArmy++; }
-
-        Stream<Integer> familiesManWorkers = Stream.of(Person.getAge());
-        List<String> d2 =  familiesManWorkers
-                .filter((Integer x) ->  x >= 18 && x <= 65)
-                .map(y -> String.valueOf(Person.getEducation()))
-                .filter(y -> y == "HIGHER")
-                .map(y -> String.valueOf(Person.getSex()))
-                .filter(y -> y == "MAN")
-                .map(n ->  String.valueOf(Person.getFamily()))
-                .sorted(Comparator.comparing(y -> Person.getFamily()))
-                 .collect(Collectors.toList());
-            if (d2.size()!=0) {System.out.println(d2);}
-            if (d2.size()!=0) { countWorkers++; }
-
-            Stream<Integer> familiesWomanWorkers = Stream.of(Person.getAge());
-            List<String> d3 =  familiesWomanWorkers
-                    .filter((Integer x) ->  x >= 18 && x <= 60)
-                    .map(y -> String.valueOf(Person.getEducation()))
-                    .filter(y -> y == "HIGHER")
-                    .map(y -> String.valueOf(Person.getSex()))
-                    .filter(y -> y == "WOMAN")
-                    .map(n ->  String.valueOf(Person.getFamily()))
-                    .sorted(Comparator.comparing(y -> Person.getFamily()))
+            List<String> d = persons.stream()
+                    .filter(x -> Person.getAge() >= 18 && Person.getAge() <= 27)
+                    .filter(y -> Person.getSex().equals(Sex.MAN))
+                    .map(Person::getFamily)
                     .collect(Collectors.toList());
-            if (d3.size()!=0) {System.out.println(d3);}
-            if (d3.size()!=0) { countWorkers++; }
-    }
+            if (d.size() != 0 && i > 9000000) {
+                System.out.println(d);
+            }
+            if (d.size() != 0) {
+                countArmy++;
+            }
 
+            List<String> d2 = persons.stream()
+                    .filter(x -> Person.getEducation().equals(Education.HIGHER))
+                    .filter(x -> Person.getAge() >= 18)
+                    .filter(x -> Person.getSex().equals(Sex.MAN) ? Person.getAge() <= 65 : Person.getAge() <= 60)
+                    .sorted(Comparator.comparing(Person::getFamily))
+                    .map(Person::getFamily)
+                    .collect(Collectors.toList());
+            if (d2.size() != 0 && i > 9000000) {
+                System.out.println(d2);
+            }
+            if (d2.size() != 0) {
+                countWorkers++;
+            }
+        }
         System.out.println("Найдено несовершеннолетних - " + count2);
         System.out.println("Найдено призывников - " + countArmy);
         System.out.println("Найдено рабочих мужчин и женщин - " + countWorkers);
 
-        }
+    }
 }
